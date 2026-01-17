@@ -20,8 +20,8 @@ repositories {
 dependencies {
     intellijPlatform {
         create(
-            "IC",
-            "2023.3.7",
+            "IU",
+            "2025.3.1",
             useInstaller = false
         )
         bundledPlugin("com.intellij.gradle")
@@ -45,8 +45,8 @@ intellijPlatform {
         name.set("Autojsx.WIFI")
         version.set(project.version.toString())
         ideaVersion {
-            sinceBuild.set("233")
-            untilBuild.set("241.*")
+            sinceBuild.set("242")
+            untilBuild.set("253.*")
         }
     }
 }
