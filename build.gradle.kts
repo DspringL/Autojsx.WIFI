@@ -1,7 +1,9 @@
+import org.jetbrains.intellij.platform.gradle.TestFrameworkType
+
 plugins {
     id("java")
-    id("org.jetbrains.kotlin.jvm") version "2.0.0"
-    id("org.jetbrains.intellij") version "1.17.4" //"1.13.3"
+    id("org.jetbrains.kotlin.jvm") version "2.0.20"
+    id("org.jetbrains.intellij.platform") version "2.0.1"
 }
 
 group = "github.zimo"
@@ -10,21 +12,56 @@ version = "1.1.6"
 
 repositories {
     mavenCentral()
-}
-
-// Configure Gradle IntelliJ Plugin
-// Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
-intellij {
-    version.set("2022.2.5")
-//    version.set("2024.2")
-    type.set("IC") // Target IDE Platform
-    plugins.set(listOf("com.intellij.gradle"/* Plugin Dependencies */))
-
-//    type.set("IU") // Target IDE Platform
-//    plugins.set(listOf("com.intellij.gradle","com.intellij.java","com.intellij.database"/* Plugin Dependencies */))
+    intellijPlatform {
+        defaultRepositories()
+    }
 }
 
 dependencies {
+    intellijPlatform {
+        create(
+            "IC",
+            "2023.3.7",
+            useInstaller = false
+        )
+        bundledPlugin("com.intellij.gradle")
+        instrumentationTools()
+        testFramework(TestFrameworkType.Platform)
+    }
+    
+    // 声明对Kotlin标准库的依赖关系
+    implementation(kotlin("test"))
+    implementation("io.vertx:vertx-web:4.4.4")
+
+    implementation("com.fasterxml.jackson.core:jackson-annotations:2.17.2")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.17.2")
+}
+
+// Configure Gradle IntelliJ Platform Plugin
+// Read more: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin.html
+intellijPlatform {
+    pluginConfiguration {
+        id.set("github.zimo.autojsx.wifi")
+        name.set("Autojsx.WIFI")
+        version.set(project.version.toString())
+        ideaVersion {
+            sinceBuild.set("233")
+            untilBuild.set("241.*")
+        }
+    }
+}
+
+dependencies {
+    intellijPlatform {
+        create(
+            "IC",
+            "2023.3.7",
+            useInstaller = false
+        )
+        bundledPlugin("com.intellij.gradle")
+        testFramework(TestFrameworkType.Platform)
+    }
+    
     // 声明对Kotlin标准库的依赖关系
     implementation(kotlin("test"))
     implementation("io.vertx:vertx-web:4.4.4")
@@ -40,12 +77,9 @@ tasks {
         targetCompatibility = "17"
     }
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions.jvmTarget = "17"
-    }
-
-    patchPluginXml {
-        sinceBuild.set("222")
-        untilBuild.set("243.*") // 2024.2
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        }
     }
 
     signPlugin {
